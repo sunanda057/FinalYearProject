@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 import gdown
 
-# Cache the model loading to prevent re-downloading every time
+# Cache the model download and load
 @st.cache_resource
 def load_model():
     try:
@@ -16,26 +16,28 @@ def load_model():
         st.error(f"Failed to load model: {e}")
         return None
 
-# Load the model
 model = load_model()
 
-# App title
 st.title("Gas Consumption Prediction App")
 
 if model is not None:
-    # Input fields
-    income = st.number_input("Enter monthly income (in ₹):", min_value=0)
-    family_size = st.number_input("Enter family size:", min_value=1)
-    has_gas_connection = st.selectbox("Do you have a gas connection?", ["Yes", "No"])
-    uses_gas_cylinder = st.selectbox("Do you use gas cylinder?", ["Yes", "No"])
+    # Collect all required inputs
+    income = st.number_input("Total Monthly Income (₹)", min_value=0)
+    family_members = st.number_input("No. of Family Members", min_value=1)
+    adults = st.number_input("No. of Adults", min_value=0)
+    children = st.number_input("No. of Children", min_value=0)
+    city = st.text_input("City")
+    state = st.text_input("State")
 
     if st.button("Predict Gas Consumption"):
-        # Prepare input data (as strings for categorical values)
+        # Create input DataFrame with correct column names
         input_data = pd.DataFrame({
-            'income': [income],
-            'family_size': [family_size],
-            'gas_connection': [has_gas_connection],   # keep as "Yes"/"No"
-            'gas_cylinder': [uses_gas_cylinder]       # keep as "Yes"/"No"
+            'Total Monthly Income (₹)': [income],
+            'No. of Family Members': [family_members],
+            'No. of Adults': [adults],
+            'No. of Children': [children],
+            'City': [city],
+            'State': [state]
         })
 
         try:
@@ -44,4 +46,4 @@ if model is not None:
         except Exception as e:
             st.error(f"Prediction failed: {e}")
 else:
-    st.warning("Model could not be loaded. Please check the file or link.")
+    st.warning("Model could not be loaded.")
